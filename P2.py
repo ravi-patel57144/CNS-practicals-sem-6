@@ -1,23 +1,47 @@
-def monoalphabetic_cipher(plaintext, key, mode):
-    key_map = dict(zip("ABCDEFGHIJKLMNOPQRSTUVWXYZ", key))
-    ciphertext = ""
-    for char in plaintext.upper():
+def generate_monoalphabetic_key():
+    import random
+    alphabet = list('abcdefghijklmnopqrstuvwxyz')
+    random.shuffle(alphabet)
+    key = dict(zip('abcdefghijklmnopqrstuvwxyz', alphabet))
+    return key
+
+
+def monoalphabetic_encrypt(text, key):
+    encrypted_text = ""
+    for char in text:
         if char.isalpha():
-            if mode == "encrypt":
-                ciphertext += key_map[char]
-            elif mode == "decrypt":
-                inverted_key_map = {v: k for k, v in key_map.items()}
-                ciphertext += inverted_key_map[char]
+            if char.isupper():
+                encrypted_text += key[char.lower()].upper()
+            else:
+                encrypted_text += key[char]
         else:
-            ciphertext += char
-    return ciphertext
+            encrypted_text += char
+    return encrypted_text
 
-key = "KDIJXBVTZLSWYGAHNUPOMCQERF"
 
-plaintext = input("Enter plaintext: ")
+def monoalphabetic_decrypt(encrypted_text, key):
+    decrypted_text = ""
+    reverse_key = {v: k for k, v in key.items()}
+    for char in encrypted_text:
+        if char.isalpha():
+            if char.isupper():
+                decrypted_text += reverse_key[char.lower()].upper()
+            else:
+                decrypted_text += reverse_key[char]
+        else:
+            decrypted_text += char
+    return decrypted_text
 
-ciphertext = monoalphabetic_cipher(plaintext, key, "encrypt")
-print("Encrypted ciphertext:", ciphertext)
 
-decrypted = monoalphabetic_cipher(ciphertext, key, "decrypt")
-print("Decrypted plaintext:", decrypted)
+# Plaintext
+plaintext = input("Enter Plaintext:")
+
+# Generate a random monoalphabetic key
+key = generate_monoalphabetic_key()
+
+encrypted_text = monoalphabetic_encrypt(plaintext, key)
+decrypted_text = monoalphabetic_decrypt(encrypted_text, key)
+
+print("Plaintext:", plaintext)
+print("Encrypted text:", encrypted_text)
+print("Decrypted text:", decrypted_text)

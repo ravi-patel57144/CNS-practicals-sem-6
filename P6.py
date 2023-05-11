@@ -1,82 +1,71 @@
 import random
 
-
 def gcd(a, b):
     while b != 0:
         a, b = b, a % b
     return a
 
-
 def mod_inverse(a, m):
-    for x in range(1, m):
-        if (a * x) % m == 1:
-            return x
-    return None
+    if gcd(a, m) != 1:
+        return None
+    u1, u2, u3 = 1, 0, a
+    v1, v2, v3 = 0, 1, m
 
+    while v3 != 0:
+        q = u3 // v3
+        v1, v2, v3, u1, u2, u3 = (
+            u1 - q * v1,
+            u2 - q * v2,
+            u3 - q * v3,
+            v1,
+            v2,
+            v3,
+        )
 
-def is_prime(n):
-    if n <= 1:
-        return False
-    elif n <= 3:
-        return True
-    elif n % 2 == 0 or n % 3 == 0:
-        return False
-    i = 5
-    while i * i <= n:
-        if n % i == 0 or n % (i + 2) == 0:
-            return False
-        i += 6
-    return True
-
+    return u1 % m
 
 def generate_keypair(p, q):
-    if not (is_prime(p) and is_prime(q)):
-        raise ValueError("Both numbers must be prime.")
-    elif p == q:
-        raise ValueError("p and q cannot be equal.")
-
+    # Calculate n = p * q
     n = p * q
+
+    # Calculate the totient of n, phi(n) = (p - 1) * (q - 1)
     phi = (p - 1) * (q - 1)
 
+    # Find e such that 1 < e < phi and gcd(e, phi) = 1
     e = random.randrange(1, phi)
-    g = gcd(e, phi)
-    while g != 1:
+    while gcd(e, phi) != 1:
         e = random.randrange(1, phi)
-        g = gcd(e, phi)
 
+    # Calculate the modular inverse of e modulo phi
     d = mod_inverse(e, phi)
 
-    return ((e, n), (d, n))
+    # Return the public and private keys
+    public_key = (e, n)
+    private_key = (d, n)
+    return public_key, private_key
 
+def rsa_encrypt(message, public_key):
+    e, n = public_key
+    encrypted_message = [pow(ord(char), e, n) for char in message]
+    return encrypted_message
 
-def encrypt(pk, plaintext):
-    e, n = pk
-    cipher = [(ord(char) ** e) % n for char in plaintext]
-    return cipher
+def rsa_decrypt(encrypted_message, private_key):
+    d, n = private_key
+    decrypted_message = [chr(pow(char, d, n)) for char in encrypted_message]
+    return ''.join(decrypted_message)
 
-
-def decrypt(pk, ciphertext):
-    d, n = pk
-    plain = [chr((char ** d) % n) for char in ciphertext]
-    return ''.join(plain)
-
-
-# Ask the user for two prime numbers
+# Example usage:
 p = int(input("Enter a prime number (p): "))
 q = int(input("Enter another prime number (q): "))
 
-# Generate the public and private keys
 public_key, private_key = generate_keypair(p, q)
 print("Public key:", public_key)
 print("Private key:", private_key)
 
-# Ask the user for a message to encrypt
 message = input("Enter a message to encrypt: ")
 
-# Encrypt the message using the public key
-ciphertext = encrypt(public_key, message)
-print("Encrypted message:", ciphertext)
+encrypted_message = rsa_encrypt(message, public_key)
+print("Encrypted message:", encrypted_message)
 
-# Decrypt the message using the private key
-plaintext = decrypt(private_key, ciphertext)
-print("Decrypted message:", plaintext)
+decrypted_message = rsa_decrypt(encrypted_message, private_key)
+print("Decrypted message:", decrypted_message)

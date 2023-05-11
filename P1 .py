@@ -1,25 +1,36 @@
-def caesar_cipher(plaintext, key, mode):
-    plaintext = plaintext.upper()
-    ciphertext = ""
-    for char in plaintext:
+def caesar_encrypt(text, shift):
+    encrypted_text = ""
+    for char in text:
         if char.isalpha():
-            if mode == "encrypt":
-                shifted = (ord(char) - 65 + key) % 26
-            elif mode == "decrypt":
-                shifted = (ord(char) - 65 - key) % 26
-            ciphertext += chr(shifted + 65)
+            if char.isupper():
+                encrypted_text += chr((ord(char) - 65 + shift) % 26 + 65)
+            else:
+                encrypted_text += chr((ord(char) - 97 + shift) % 26 + 97)
         else:
-            ciphertext += char
-    return ciphertext
+            encrypted_text += char
+    return encrypted_text
 
 
-plaintext = input("Enter plaintext: ")
-key = int(input("Enter key: "))
+def caesar_decrypt(encrypted_text, shift):
+    decrypted_text = ""
+    for char in encrypted_text:
+        if char.isalpha():
+            if char.isupper():
+                decrypted_text += chr((ord(char) - 65 - shift) % 26 + 65)
+            else:
+                decrypted_text += chr((ord(char) - 97 - shift) % 26 + 97)
+        else:
+            decrypted_text += char
+    return decrypted_text
 
-# Encrypt
-ciphertext = caesar_cipher(plaintext, key, "encrypt")
-print("Encrypted ciphertext:", ciphertext)
 
-# Decrypt
-decrypted = caesar_cipher(ciphertext, key, "decrypt")
-print("Decrypted plaintext:", decrypted)
+# Example usage:
+plaintext = input("Enter Plaintext:")
+shift = int(input("Enter Key:"))
+
+encrypted_text = caesar_encrypt(plaintext, shift)
+decrypted_text = caesar_decrypt(encrypted_text, shift)
+
+print("Plaintext:", plaintext)
+print("Encrypted text:", encrypted_text)
+print("Decrypted text:", decrypted_text)
